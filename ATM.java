@@ -1,247 +1,171 @@
-/**
-* This program simulates a simple ATM environment.
-* ATM supports deposits, withdrawals, transfers, and balance inquiries.
-* ATM does not currently validate user input.
-* All currency is in USD $
-* @author Carlos Capo 2011
-* @version 0.1
-*
-*/
-
-
-import java.text.NumberFormat; // Helps with formatting doubles as currency
-import java.util.Scanner; // Will be used to get input from the user
+import java.util.Scanner;
 
 public class ATM {
-	
-	public static void main(String[] args) {
-	
-		// Create and instantiate two Account objects
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
 
-		Account checking = new Account();
-		checking.setType("Checking");
-		checking.setBalance(0.00);
-		checking.setRate(0.00);
+        // Create a bank with some dummy accounts
+        Bank bank = new Bank();
+        bank.addAccount("123456", "John Doe", 1000);
+        bank.addAccount("789012", "Jane Smith", 500);
 
-		Account savings = new Account();
-		savings.setType("Savings");
-		savings.setBalance(0.00);
-		savings.setRate(2.00);
+        // Prompt user for login
+        System.out.println("Welcome to the iNeuron ATM");
+        System.out.print("Enter User ID: ");
+        String userID = scanner.nextLine();
+        System.out.print("Enter PIN: ");
+        String userPIN = scanner.nextLine();
 
-		NumberFormat formatter = NumberFormat.getCurrencyInstance(); // Creates the formatter object for currency
-		Scanner sc = new Scanner(System.in); // Creates the sc object to read user input
+        // Authenticate user
+        AccountHolder user = bank.authenticateUser(userID, userPIN);
+        if (user != null) {
+            System.out.println("Login Successful!");
 
-		boolean session = true; // This variable will break the (while) loop when false
+            // Display available options
+            while (true) {
+                System.out.println("\nOptions:");
+                System.out.println("1. Show Transaction History");
+                System.out.println("2. Withdraw");
+                System.out.println("3. Deposit");
+                System.out.println("4. Transfer");
+                System.out.println("5. Quit");
+                System.out.print("Choose an option: ");
+                int choice = scanner.nextInt();
+                scanner.nextLine(); // consume newline
 
-		while (session) {
-
-			// Present the user with a menu of 5 options
-
-			System.out.print("\nATM Menu: \n \n"
-							 + "1. Deposit Money \n"
-							 + "2. Withdraw Money \n"
-							 + "3. Transfer Funds \n"
-							 + "4. Check Account Balance\n"
-							 + "5. End Session\n \n"
-							 + "Enter selection: ");
-
-			int selection = sc.nextInt(); // assign the user's input to the selection variable
-
-			// This switch block will handle one of five selections and deal with them appropriately
-
-			switch (selection) {
-
-				// case 1 handles the depositing of money
-
-				case 1:
-					System.out.print("Enter (1) for Savings or (2) for Checking: ");
-					int depAccount = sc.nextInt(); // Keeps track of which account to deposit money to
-
-					if (depAccount == 1) {
-
-						System.out.println("\nYour current Savings balance is: " + formatter.format(savings.getBalance()) + "\n");
-
-						System.out.println("How much money would you like to deposit?");
-						double deposit = sc.nextDouble();
-
-						savings.deposit(deposit);
-
-						System.out.println("\nYour Savings balance is now: " + formatter.format(savings.getBalance()) + "\n");
-						
-
-					}
-
-					else if (depAccount == 2) {
-						
-						System.out.println("\nYour current Checking balance is: " + formatter.format(checking.getBalance()) + "\n");
-
-						System.out.println("How much money would you like to deposit?");
-						double deposit = sc.nextDouble();
-
-						checking.deposit(deposit);
-
-						System.out.println("\nChecking balance is now: " + formatter.format(checking.getBalance()) + "\n");
-
-					}
-
-					break;
-
-				
-
-				// case 2 handles the withdrawal of money	
-
-				case 2:
-					System.out.print("\nEnter (1) for Savings or (2) for Checking: ");
-					int witAccount = sc.nextInt(); // Keeps track of which account to withdraw from
-
-					if (witAccount == 1) {
-
-						System.out.println("\nYour current Savings balance is: " + formatter.format(savings.getBalance()) + "\n");
-
-						System.out.println("How much money would you like to withdraw?");
-						double withdraw = sc.nextDouble();
-
-						savings.withdraw(withdraw);
-
-						System.out.println("\nYour Savings balance is now: " + formatter.format(savings.getBalance()) + "\n");
-						
-
-					}
-
-					else if (witAccount == 2) {
-						
-						System.out.println("\nYour current Checking balance is: " + formatter.format(checking.getBalance()) + "\n");
-
-						System.out.println("How much money would you like to withdraw?");
-						double withdraw = sc.nextDouble();
-
-						checking.withdraw(withdraw);
-
-						System.out.println("\nYour Checking balance is now: " + formatter.format(checking.getBalance()) + "\n");
-
-					}
-
-					break;
-
-				// case 3 handles the transfer of funds	
-
-				case 3:
-					System.out.print("\nFrom which account do you wish to transfer funds from?, (1) for Savings or (2) for Checking: ");
-					int tranAccount = sc.nextInt();
-
-					if (tranAccount == 1) {
-
-						System.out.println("\nYour current Savings balance is: " + formatter.format(savings.getBalance()) + "\n");
-
-						System.out.print("How much money do you wish to transfer from Savings to Checking?: ");
-						double tranAmount = sc.nextDouble();
-
-						savings.withdraw(tranAmount);
-						checking.deposit(tranAmount);
-
-						System.out.println("\nYou successfully transferred " + formatter.format(tranAmount) + " from Savings to Checking");
-
-						System.out.println("\nChecking Balance: " + formatter.format(checking.getBalance()));
-						System.out.println("Savings Balance: " + formatter.format(savings.getBalance()) + "\n");
-
-					}
-
-					else if (tranAccount == 2) {
-
-						System.out.println("\nYour current Checking balance is: " + formatter.format(checking.getBalance()) + "\n");
-
-						System.out.print("How much money do you wish to transfer from Checking to Saving?: ");
-						double tranAmount = sc.nextDouble();
-
-						checking.withdraw(tranAmount);
-						savings.deposit(tranAmount);
-
-						System.out.println("\nYou successfully transferred " + formatter.format(tranAmount) + " from Checking to Savings");
-
-						System.out.println("\nChecking Balance: " + formatter.format(checking.getBalance()));
-						System.out.println("Savings Balance: " + formatter.format(savings.getBalance()) + "\n");
-						
-					}
-
-					break;
-					
-				// case 4 simply outputs the balances of both Checking and Savings accounts	
-				
-				case 4:
-					System.out.println("\nChecking Balance: " + formatter.format(checking.getBalance()));
-					System.out.println("Savings Balance: " + formatter.format(savings.getBalance()) + "\n");
-					
-					break;
-
-				// case 5 breaks out of the (while) loop when the user is finished using the ATM
-
-				case 5:
-					session = false;
-					
-					break;
-
-			}				 	
-			
-
-		}
-
-		System.out.println("\nThank you for banking with us!\n");
-
-	}
-
+                switch (choice) {
+                    case 1:
+                        bank.showTransactionHistory(user);
+                        break;
+                    case 2:
+                        System.out.print("Enter amount to withdraw: ");
+                        double withdrawAmount = scanner.nextDouble();
+                        bank.withdraw(user, withdrawAmount);
+                        break;
+                    case 3:
+                        System.out.print("Enter amount to deposit: ");
+                        double depositAmount = scanner.nextDouble();
+                        bank.deposit(user, depositAmount);
+                        break;
+                    case 4:
+                        System.out.print("Enter recipient's account number: ");
+                        String recipientAccount = scanner.nextLine();
+                        System.out.print("Enter amount to transfer: ");
+                        double transferAmount = scanner.nextDouble();
+                        bank.transfer(user, recipientAccount, transferAmount);
+                        break;
+                    case 5:
+                        System.out.println("Thank you for using iNeuron ATM. Goodbye!");
+                        System.exit(0);
+                    default:
+                        System.out.println("Invalid choice. Please try again.");
+                }
+            }
+        } else {
+            System.out.println("Invalid User ID or PIN. Please try again.");
+        }
+    }
 }
 
+class AccountHolder {
+    private String userID;
+    private String userPIN;
+
+    public AccountHolder(String userID, String userPIN) {
+        this.userID = userID;
+        this.userPIN = userPIN;
+    }
+
+    public String getUserID() {
+        return userID;
+    }
+
+    public String getUserPIN() {
+        return userPIN;
+    }
+}
 
 class Account {
+    private String accountNumber;
+    private String accountHolderName;
+    private double balance;
 
-	// Here we declare some variables that a typical bank account will have
+    public Account(String accountNumber, String accountHolderName, double balance) {
+        this.accountNumber = accountNumber;
+        this.accountHolderName = accountHolderName;
+        this.balance = balance;
+    }
 
-	String type;
-	double balance;
-	double rate;
+    public String getAccountNumber() {
+        return accountNumber;
+    }
 
-	// The following methods are a combination of getter/setter methods as well
-	// as two special deposit() and withdraw() methods
+    public double getBalance() {
+        return balance;
+    }
 
-	void setType(String accType) {
-		
-		type = accType;
-	}
+    public void deposit(double amount) {
+        balance += amount;
+    }
 
-	void setBalance(double accBal) {
-		
-		balance = accBal;
-	}
+    public boolean withdraw(double amount) {
+        if (amount <= balance) {
+            balance -= amount;
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-	void setRate(double accRate) {
-		
-		rate = accRate;
-	}
-
-	void deposit(double dep) {
-		
-		balance += dep; // Take the Account object's balance and add to it the current deposit
-	}
-
-	void withdraw(double wit) {
-		
-		balance -= wit; // Take the Account object's balance and subtract from it the current withdrawal
-	}
-
-
-	String getType() {
-		
-		return type;
-	}
-
-	double getBalance() {
-		
-		return balance;
-	}
-
-	double getRate() {
-		
-		return rate;
-	}
-
+    public void transfer(double amount) {
+        balance -= amount;
+    }
 }
+
+class Bank {
+    private Account[] accounts;
+    private int numAccounts;
+
+    public Bank() {
+        accounts = new Account[10];
+        numAccounts = 0;
+    }
+
+    public void addAccount(String accountNumber, String accountHolderName, double balance) {
+        if (numAccounts < accounts.length) {
+            accounts[numAccounts] = new Account(accountNumber, accountHolderName, balance);
+            numAccounts++;
+        } else {
+            System.out.println("Cannot add more accounts. Bank is full.");
+        }
+    }
+
+    public AccountHolder authenticateUser(String userID, String userPIN) {
+        // Dummy authentication logic
+        if (userID.equals("123") && userPIN.equals("456")) {
+            return new AccountHolder(userID, userPIN);
+        } else {
+            return null;
+        }
+    }
+
+    public void showTransactionHistory(AccountHolder user) {
+        // Dummy method
+        System.out.println("Transaction history not available.");
+    }
+
+    public void withdraw(AccountHolder user, double amount) {
+        // Dummy method
+        System.out.println("Withdraw functionality not implemented.");
+    }
+
+    public void deposit(AccountHolder user, double amount) {
+        // Dummy method
+        System.out.println("Deposit functionality not implemented.");
+    }
+
+    public void transfer(AccountHolder user, String recipientAccount, double amount) {
+        // Dummy method
+        System.out.println("Transfer functionality not implemented.");
+    }
+	}
